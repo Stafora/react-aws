@@ -1,50 +1,64 @@
-# React + TypeScript + Vite
+# 🚀 React AWS Integration
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+📌 A React application demonstrating integration with AWS services such as IAM, S3, and Cognito.
 
-Currently, two official plugins are available:
+## 🛠️ Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Frontend:** React, TypeScript
+- **State Management:** Context API, zustand
+- **Styling:** Tailwind
+- **AWS Services:** IAM, S3, Cognito
 
-## Expanding the ESLint configuration
+## 📚 Installation & Setup
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### 🗃️ Requirements
 
-- Configure the top-level `parserOptions` property like this:
+- Node.js 22.12.0
+- AWS Account with necessary permissions
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### 1️⃣ Clone the repository
+
+```bash
+git clone https://github.com/Stafora/react-aws.git
+cd react-aws
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2️⃣ Install dependencies
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```bash
+npm install
 ```
+
+### 3️⃣ Install AWS Amplify CLI
+
+```bash
+npm install -g @aws-amplify/cli
+```
+
+### 4️⃣ Configure AWS Amplify
+
+```bash
+amplify configure
+```
+
+### 5️⃣ Initialize Amplify in the project
+
+```bash
+amplify init
+```
+
+### 6️⃣ Start the project
+
+```bash
+npm run dev
+```
+
+## ✅ Features
+
+- ✅ Integrate with AWS IAM for identity and access management
+- ✅ File storage with AWS S3
+- ✅ User authentication and authorization with AWS Cognito
+
+---
+
+This project demonstrates best practices for integrating React applications with AWS services, ensuring scalability and security. 🚀

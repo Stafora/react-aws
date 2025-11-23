@@ -1,7 +1,7 @@
 import React from "react";
 import Layout from '@/components/layout';
 import FileUpload from '../components/FileUpload'
-import FileList from '../components/FIleList'
+import FileList from '../components/FileList'
 
 const Files = () => {
     return (
@@ -12,5 +12,5 @@ const Files = () => {
         </Layout>
     )
 }
-  
+
 export default Files;

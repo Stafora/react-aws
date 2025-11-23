@@ -1,27 +1,19 @@
-import AuthBaseInterface, { AuthError } from '../interfaces/auth-base-interface'
+import AuthBaseInterface, { AuthError, UserInterface, ResultInterface } from '../interfaces/auth-base-interface'
 import { signIn, signUp, confirmSignUp, signOut, fetchUserAttributes } from "aws-amplify/auth"
 import useUserStore from '../store/user-store'
 
 class Auth implements AuthBaseInterface {
-    async login(username: string, password: string) {
-        try{
-            await signIn({
-                username, 
-                password
-            })
-            return {
-                success: true
-            }
-        } catch(e) {
-            return {
-                success: false,
-                error: new AuthError(e instanceof Error ? e?.message : 'Error when "signIn" in with aws-amplify/auth', 400)
-            }
+    async login(username: string, password: string): Promise<ResultInterface> {
+        try {
+            await signIn({ username, password })
+            return { success: true }
+        } catch (error) {
+            return this.handleError(error, 'signIn');
         }
     }
 
-    async registration(username: string, password: string, email: string) {
-        try{
+    async registration(username: string, password: string, email: string): Promise<ResultInterface> {
+        try {
             await signUp({
                 username: email,
                 password,
@@ -32,72 +24,64 @@ class Auth implements AuthBaseInterface {
                     },
                 }
             })
-            return {
-                success: true
-            }
-        } catch(e) {
-            return {
-                success: false,
-                error: new AuthError(e instanceof Error ? e?.message : 'Error when "signUp" in with aws-amplify/auth', 400)
-            }
+            return { success: true }
+        } catch (error) {
+            return this.handleError(error, 'signUp');
         }
     }
 
-    async confirmRegistration(email: string, confirmationCode: string) {
-        try{
+    async confirmRegistration(email: string, confirmationCode: string): Promise<ResultInterface> {
+        try {
             await confirmSignUp({
                 username: email,
                 confirmationCode
             })
-            return {
-                success: true
-            }
-        } catch(e) {
-            return {
-                success: false,
-                error: new AuthError(e instanceof Error ? e?.message : 'Error when "confirmSignUp" in with aws-amplify/auth', 400)
-            }
+            return { success: true }
+        } catch (error) {
+            return this.handleError(error, 'confirmSignUp');
         }
     }
 
-    async getUser() {
-        try{
+    async getUser(): Promise<UserInterface | null> {
+        try {
             const store = useUserStore.getState();
-            if(store.user) return store.user
-            
-            const user = await fetchUserAttributes();
-            const userData = { 
-                id: user.sub,
-                email: user.email,
-                name: user.name
-            }
+            if (store.user) return store.user;
+
+            const userAttributes = await fetchUserAttributes();
+            const userData: UserInterface = {
+                id: userAttributes.sub,
+                email: userAttributes.email,
+                name: userAttributes.name
+            };
+
             useUserStore.setState({ user: userData });
-            return userData
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        } catch(e) {
-            return null
+            return userData;
+        } catch (error) {
+            return null;
         }
     }
 
-    async checkUser() {
-        const a = await this.getUser()
-        return !!a
+    async checkUser(): Promise<boolean> {
+        const user = await this.getUser();
+        return !!user;
     }
 
-    async logout() {
-        try{
-            await signOut()
-            const store = useUserStore.getState();
-            store.clearUser()
-            return {
-                success: true
-            }
-        } catch(e){
-            return {
-                success: false,
-                error: new AuthError(e instanceof Error ? e?.message : 'Error when "confirmSignUp" in with aws-amplify/auth', 400)
-            }
+    async logout(): Promise<ResultInterface> {
+        try {
+            await signOut();
+            useUserStore.getState().clearUser();
+            return { success: true };
+        } catch (error) {
+            return this.handleError(error, 'signOut');
         }
+    }
+
+    private handleError(error: unknown, context: string): ResultInterface {
+        const message = error instanceof Error ? error.message : `Unknown error during ${context}`;
+        return {
+            success: false,
+            error: new AuthError(message, 400)
+        };
     }
 }
 

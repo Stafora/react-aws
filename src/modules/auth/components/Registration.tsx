@@ -45,7 +45,7 @@ const validationSchema = yup.object({
         .oneOf([yup.ref('password')], 'Passwords must match'),
 });
 
-const Login = (props: PropsInterface) => {
+const Registration = (props: PropsInterface) => {
     const { changeForm } = props;
     const { setLoading } = useLoading();
 
@@ -60,13 +60,13 @@ const Login = (props: PropsInterface) => {
 
     const onSubmit = async (data: FormValues) => {
         setLoading(true)
-        
+
         const result = await AuthService.registration(data.username, data.password, data.email)
 
-        if(result.success){
+        if (result.success) {
             changeForm(AuthFormsEnum.CONFIRM_REGISTRATION)
         }
-        if(result?.error?.message){
+        if (result?.error?.message) {
             setError('email', {
                 type: "manual",
                 message: result?.error?.message,
@@ -78,7 +78,7 @@ const Login = (props: PropsInterface) => {
     return (
         <>
             <Title>Registration</Title>
-            
+
             <form onSubmit={handleSubmit(onSubmit)}>
                 <Input label="Username" {...register('username')} error={errors.username?.message} />
                 <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
@@ -89,7 +89,7 @@ const Login = (props: PropsInterface) => {
                     <Button type="submit" viewType="primary">
                         SignUp
                     </Button>
-                    <Button type="button" viewType="secondary" eventClick={() => changeForm(AuthFormsEnum.LOGIN)}>
+                    <Button type="button" viewType="secondary" onClick={() => changeForm(AuthFormsEnum.LOGIN)}>
                         Login
                     </Button>
                 </div>
@@ -98,4 +98,4 @@ const Login = (props: PropsInterface) => {
     )
 }
 
-export default Login;
+export default Registration;

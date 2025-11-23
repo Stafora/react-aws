@@ -8,32 +8,36 @@ interface PropsInterface {
     file: FileInterface
 }
 
-const FileItem = (props: PropsInterface) => {
-    const typeStr = props.file.path.slice(props.file.path.lastIndexOf('.') + 1);
+const FileItem = ({ file }: PropsInterface) => {
+    const fileName = file.path.split('/').pop() || file.path;
+    const fileType = fileName.split('.').pop() || 'unknown';
 
-    const handleGetName = () => {
-        const arr = props.file.path.split('/')
-        return arr[arr.length - 1]
-    }
-    const nameStr = handleGetName()
-
-    const handleRemovFile = async () => {
-        await FilesService.remove(props.file.path)
-        eventBus.emit('fetch-files-event')
+    const handleRemoveFile = async () => {
+        if (window.confirm(`Are you sure you want to delete ${fileName}?`)) {
+            await FilesService.remove(file.path);
+            eventBus.emit('fetch-files-event');
+        }
     }
 
     return (
-        <div className="border-2 border-white rounded-md flex items-center mb-2">
-            <div className="w-3/6 pl-4">
-                File: {nameStr}
+        <div className="border border-gray-200 rounded-md flex items-center p-4 bg-white shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex-1 truncate pr-4">
+                <span className="font-medium text-gray-700">{fileName}</span>
             </div>
-            <div className="w-1/6 pl-4">
-                Type: {typeStr}
+            <div className="w-24 text-sm text-gray-500 uppercase text-center">
+                {fileType}
             </div>
 
-            <ButtonDefault type="button" viewType="danger" className="w-1/6 ml-auto" eventClick={handleRemovFile}>
-                Delete
-            </ButtonDefault>
+            <div className="ml-4">
+                <ButtonDefault
+                    type="button"
+                    viewType="danger"
+                    onClick={handleRemoveFile}
+                    className="text-sm px-3 py-1"
+                >
+                    Delete
+                </ButtonDefault>
+            </div>
         </div>
     )
 }

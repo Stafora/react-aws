@@ -1,6 +1,8 @@
-import Auth from '@/modules/auth/pages/Auth'
-import Profile from '@/modules/auth/pages/Profile';
-import Files from '@/modules/files/pages/Files'
+import { lazy } from 'react';
+
+const Auth = lazy(() => import('@/modules/auth/pages/Auth'));
+const Profile = lazy(() => import('@/modules/auth/pages/Profile'));
+const Files = lazy(() => import('@/modules/files/pages/Files'));
 
 export const routes = [
     {

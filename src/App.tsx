@@ -3,8 +3,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { routes } from './routes'
 import ProtectedRoute from './modules/auth/page-access/ProtectedRoute'
-import { LoadingProvider, useLoading } from '@/providers/LoadingContext';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import { LoadingProvider } from '@/providers/LoadingContext';
+import GlobalLoader from '@/components/common/GlobalLoader';
 
 export default function App() {
     return (
@@ -30,13 +30,3 @@ export default function App() {
         </LoadingProvider>
     );
 }
-
-const GlobalLoader = () => {
-    const { loading } = useLoading();
-
-    if (loading) {
-        return <LoadingSpinner />;
-    }
-
-    return null;
-};

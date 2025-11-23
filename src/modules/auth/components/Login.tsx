@@ -2,13 +2,13 @@ import React from "react";
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from "react-router-dom";
 
 import { AuthFormsType, AuthFormsEnum } from '@/modules/auth/types'
 import Button from '@/components/buttons/Button'
 import Input from '@/components/form/Input'
 import AuthService from '@/modules/auth/services/auth'
 import Title from './_parts/Title'
-import { useNavigate } from "react-router-dom";
 import { useLoading } from '@/providers/LoadingContext';
 
 interface PropsInterface {
@@ -29,10 +29,6 @@ const validationSchema = yup.object({
         .string()
         .required('Password is required')
         .min(8, 'The password must contain a minimum of 8 characters')
-        .matches(/[A-Z]/, 'The password must contain at least one capital letter')
-        .matches(/[a-z]/, 'The password must contain at least one lowercase letter')
-        .matches(/\d/, 'The password must contain at least one digit')
-        //.matches(/[@$!%*?&#]/, 'The password must contain at least one special character')
 });
 
 const Login = (props: PropsInterface) => {
@@ -55,34 +51,51 @@ const Login = (props: PropsInterface) => {
 
     const onSubmit = async (data: FormValues) => {
         setLoading(true)
-        const result = await AuthService.login(data.username, data.password)
-        if(result.success){
-            navigate('/', { replace: true })
-        }
-        
-        if(result?.error?.message){
-            setError('password', {
-                type: "manual",
-                message: result?.error?.message,
-            })
-        }
+        try {
+            const result = await AuthService.login(data.username, data.password)
 
-        setLoading(false)
+            if (result.success) {
+                navigate('/', { replace: true })
+            } else if (result?.error?.message) {
+                setError('password', {
+                    type: "manual",
+                    message: result.error.message,
+                })
+                // Also show general error if needed, or map specific errors
+            }
+        } catch (error) {
+            console.error("Login error:", error);
+            setError('root', {
+                type: 'manual',
+                message: 'An unexpected error occurred'
+            });
+        } finally {
+            setLoading(false)
+        }
     };
 
     return (
         <>
             <Title>Login</Title>
-            
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <Input label="Username" {...register('username')} error={errors.username?.message} />
-                <Input label="Password" type="password" {...register('password')} error={errors.password?.message} />
 
-                <div className="mt-4 grid grid-column-2 grid-flow-col gap-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Input
+                    label="Username"
+                    {...register('username')}
+                    error={errors.username?.message}
+                />
+                <Input
+                    label="Password"
+                    type="password"
+                    {...register('password')}
+                    error={errors.password?.message}
+                />
+
+                <div className="mt-6 grid grid-cols-2 gap-4">
                     <Button type="submit" viewType="primary">
                         SignIn
                     </Button>
-                    <Button type="button" viewType="secondary" eventClick={() => changeForm(AuthFormsEnum.REGISTRATION)}>
+                    <Button type="button" viewType="secondary" onClick={() => changeForm(AuthFormsEnum.REGISTRATION)}>
                         Registration
                     </Button>
                 </div>

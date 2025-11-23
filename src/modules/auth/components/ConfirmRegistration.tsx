@@ -2,13 +2,13 @@ import React from "react";
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from "react-router-dom";
 
 import Button from '@/components/buttons/Button'
 import Input from '@/components/form/Input'
 import AuthService from '@/modules/auth/services/auth'
 import Title from './_parts/Title'
 import { useLoading } from '@/providers/LoadingContext';
-import { useNavigate } from "react-router-dom";
 
 type FormValues = {
     code: string;
@@ -19,18 +19,17 @@ const validationSchema = yup.object({
     code: yup
         .string()
         .required('Code is required')
-        .min(6, 'The username must contain 6 numbers')
-        .max(6, 'The username must contain 6 numbers'),
+        .length(6, 'The code must contain exactly 6 characters'),
     email: yup
         .string()
         .required('Email is required')
-        .email('Must be email')
+        .email('Must be a valid email')
 });
 
 const ConfirmRegistration = () => {
     const navigate = useNavigate();
     const { setLoading } = useLoading();
-    
+
     const {
         register,
         handleSubmit,
@@ -42,31 +41,46 @@ const ConfirmRegistration = () => {
 
     const onSubmit = async (data: FormValues) => {
         setLoading(true)
-        
-        const result = await AuthService.confirmRegistration(data.email, data.code)
+        try {
+            const result = await AuthService.confirmRegistration(data.email, data.code)
 
-        if(result.success){
-            navigate('/', { replace: true })
+            if (result.success) {
+                navigate('/', { replace: true })
+            } else if (result?.error?.message) {
+                setError('code', {
+                    type: "manual",
+                    message: result.error.message,
+                })
+            }
+        } catch (error) {
+            console.error("Confirmation error:", error);
+            setError('root', {
+                type: 'manual',
+                message: 'An unexpected error occurred'
+            });
+        } finally {
             setLoading(false)
         }
-        if(result?.error?.message){
-            setError('code', {
-                type: "manual",
-                message: result?.error?.message,
-            })
-        }
     };
-    
+
     return (
         <>
-            <Title>Registration</Title>
-            
-            <form onSubmit={handleSubmit(onSubmit)}>
-                <Input label="Email" {...register('email')} error={errors.email?.message} />
-                <Input label="Code" {...register('code')} error={errors.code?.message} />
+            <Title>Confirm Registration</Title>
 
-                <div className="mt-4 grid grid-column-2 grid-flow-col gap-6">
-                    <Button type="submit" viewType="primary">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <Input
+                    label="Email"
+                    {...register('email')}
+                    error={errors.email?.message}
+                />
+                <Input
+                    label="Confirmation Code"
+                    {...register('code')}
+                    error={errors.code?.message}
+                />
+
+                <div className="mt-6">
+                    <Button type="submit" viewType="primary" className="w-full">
                         Confirm Email
                     </Button>
                 </div>
